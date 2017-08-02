@@ -39,16 +39,18 @@ Puppet::Type.type(:ldap_entry).provide(:ldap) do
   end
 
   def create
+    status = String.new
+    message = String.new
     if @entry
       resource[:attributes].each do |k, v|
         if @entry.respond_to?(k)
           next if @mutable.include? k
           unless @entry.send(k).to_set == [v].flatten.to_set
-            ldap_replace_attribute([resource[:host], resource[:port], resource[:username], resource[:password],
+            status, message = ldap_replace_attribute([resource[:host], resource[:port], resource[:username], resource[:password],
                         [resource[:name], k, v]])
           end
         else
-          ldap_add_attribute([resource[:host], resource[:port], resource[:username], resource[:password],
+          status, message = ldap_add_attribute([resource[:host], resource[:port], resource[:username], resource[:password],
                         [resource[:name], k, v]])
         end
       end
